@@ -27,7 +27,7 @@ class Line {
   
   num thickness;
   LineType lineType = LineType.LINEPOINTS;
-  num pointRadius = 6;
+  num pointRadius = 2;
   AxisType axisType;
 
   num get minX=>points.map((Point p)=>p.x).reduce((value, element)=>element>value?value:element);

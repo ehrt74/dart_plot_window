@@ -57,6 +57,10 @@ class PlotWindow {
     axes.values.forEach((Axis axis)=>axis.sizeFluid = false);
   }
 
+  static Rectangle _shift(Rectangle r, Point offset) {
+    return new Rectangle.fromPoints(r.topLeft-offset, r.bottomRight-offset);
+  }
+
   static Rectangle _zoom(Rectangle r, num factor, [ List<AxisTypes> axisTypes, Point center]) {
     if (center==null)
       center = new Point(r.left + r.width/2, r.top + r.height/2);
@@ -79,6 +83,9 @@ class PlotWindow {
     return new Rectangle(left, top, width, height);
   }
 
+  bool mouseDrag = false;
+  Point oldOffset;
+  
   Map<String, Line> lines = new Map<String, Line>();
   
   PlotWindow(this.canvas) {
@@ -96,6 +103,21 @@ class PlotWindow {
       }
       this.rectangle = _zoom(this.rectangle, (delta/500 +1), axisTypes, toRectangle(e.offset));
       this.plot();
+    });
+    this.canvas.onMouseDown.listen((var e) {
+      this.mouseDrag = true;
+      this.oldOffset = e.offset;
+    });
+    this.canvas.onMouseUp.listen((_)=>this.mouseDrag = false);
+    this.canvas.onMouseOut.listen((_)=>this.mouseDrag = false);
+    this.canvas.onMouseMove.listen((var e) {
+      if (this.mouseDrag) {
+        var offset = toRectangle(e.offset) - toRectangle(this.oldOffset);
+        this.rectangle = _shift(this.rectangle, offset);
+        this.oldOffset = e.offset;
+        clear();
+        plot();
+      }
     });
   }
 
@@ -121,7 +143,7 @@ class PlotWindow {
   }
   
   void plot() {
-    if(axes.values.map((Axis a)=>a.sizeFluid).contains(true))
+    if(axes.values.map((Axis a)=>a.sizeFluid).contains(true) && !this.mouseDrag)
       rectangle = _zoom(lines.values.map((Line l)=>l.rectangle).reduce((value, element)=>value.boundingBox(element)), 1.1);
     setXTics();
     setYTics();
