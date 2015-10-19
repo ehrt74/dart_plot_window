@@ -57,13 +57,26 @@ class PlotWindow {
     axes.values.forEach((Axis axis)=>axis.sizeFluid = false);
   }
 
-  static Rectangle _zoom(Rectangle r, num factor, [Point center]) {
+  static Rectangle _zoom(Rectangle r, num factor, [ List<AxisTypes> axisTypes, Point center]) {
     if (center==null)
       center = new Point(r.left + r.width/2, r.top + r.height/2);
-
-    var r2 =  new Rectangle.fromPoints( ((r.topLeft - center) * factor) + center,
-        ((r.bottomRight - center) * factor)+ center);
-    return r2;
+    num left = r.left;
+    num width = r.width;
+    num top = r.top;
+    num height = r.height;
+    if (axisTypes==null || axisTypes.isEmpty || axisTypes.contains(AxisType.Y)) {
+      top -= center.y;
+      top *= factor;
+      top += center.y;
+      height *= factor;
+    }
+    if (axisTypes==null || axisTypes.isEmpty || axisTypes.contains(AxisType.X)) {
+      left -= center.x;
+      left *= factor;
+      left += center.x;
+      width *= factor;
+    }
+    return new Rectangle(left, top, width, height);
   }
 
   Map<String, Line> lines = new Map<String, Line>();
@@ -73,8 +86,15 @@ class PlotWindow {
     this.canvas.onMouseWheel.listen((WheelEvent e) {
       axes.values.forEach((Axis axis)=>axis.sizeFluid = false);
       this.clear();
-      print("delta: (${e.deltaX}, ${e.deltaY}), offset: ${e.offset}");
-      this.rectangle = _zoom(this.rectangle, (e.deltaY/500 +1), toRectangle(e.offset));
+      List<AxisType> axisTypes = new List<AxisType>();
+      num delta = e.deltaY;
+      if (e.altKey)
+        axisTypes.add(AxisType.Y);
+      if (e.shiftKey) {
+        axisTypes.add(AxisType.X);
+        delta = e.deltaX;
+      }
+      this.rectangle = _zoom(this.rectangle, (delta/500 +1), axisTypes, toRectangle(e.offset));
       this.plot();
     });
   }
@@ -136,19 +156,16 @@ class PlotWindow {
     });
     bool xOnAxis = false;
     bool yOnAxis = false;
-    num xOffset;
-    num yOffset;
+    num xOffset = xTics.first;
+    num yOffset = yTics.last;
     if (xTics.first<0 && xTics.last>0) xOnAxis = true;
-    if ( toCanvas(new Point(xTics.first,0) - new Point(rectangle.left,0)).x<50)
-      xOffset = xTics[1];
-    else
-      xOffset = xTics[0];
+    if (!validPointForText(new Point(xTics.first, yTics.first)))
+      xOffset=xTics[1];
+    
     if (yTics.first<0 && yTics.last>0) yOnAxis = true;
-    if ( toCanvas(new Point(0,rectangle.bottom) - new Point(0,yTics.last) ).y<50)
-      yOffset = yTics[yTics.length - 2];
-    else
-      yOffset = yTics.last;
-    num skew = (toCanvas(new Point(xTics[1],0)) - toCanvas(new Point(xTics[0],0))).x/3;
+    if (!validPointForText(new Point(xTics[2], yTics.last)))
+      yOffset=yTics[yTics.length -2];
+
     context.font = "10px sans-serif";
     context.fillStyle = "${Color.BLACK}";
     context.textAlign = "end";

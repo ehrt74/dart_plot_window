@@ -1,14 +1,14 @@
 name: plot_window
-description: A starting point for Dart libraries or applications.
-version: 0.0.1
-#author: Your Name <email@example.com>
-#homepage: https://www.example.com
+description: A library to use a canvas element to plot data
+version: 0.0.2
+author: Edouard Tavinor <edouardtavinor@gmail.com>
+homepage: https://github.com/ehrt74/dart_plot_window
 
 environment:
-  sdk: '>=1.0.0 <2.0.0'
+  sdk: '>=1.8.0 <2.0.0'
 
 dependencies:
-  browser: '>0.10.0'
+  browser: '^0.10.0+2'
 
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'

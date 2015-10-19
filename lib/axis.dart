@@ -6,6 +6,8 @@ class AxisType {
   static AxisType X = new AxisType._intern("x");
   static AxisType Y2 = new AxisType._intern("y2");
 
+  String toString()=>this.name;
+  
   AxisType._intern(this.name);
 
 }
