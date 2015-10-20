@@ -63,7 +63,7 @@ class PlotWindow {
     return new Rectangle.fromPoints(r.topLeft-offset, r.bottomRight-offset);
   }
 
-  static Rectangle _zoom(Rectangle r, num factor, [ List<AxisTypes> axisTypes, Point center]) {
+  static Rectangle _zoom(Rectangle r, num factor, [ List<AxisType> axisTypes, Point center]) {
     if (center==null)
       center = new Point(r.left + r.width/2, r.top + r.height/2);
     num left = r.left;
