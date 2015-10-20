@@ -27,6 +27,7 @@ class Color {
   int blue;
 
   static Color BLACK = new Color(0,0,0);
+  static Color WHITE = new Color(255,255,255);
   
   String toString()=>"#${red.toRadixString(16).padLeft(2, '0')}${green.toRadixString(16).padLeft(2, '0')}${blue.toRadixString(16).padLeft(2,'0')}";
   
@@ -48,6 +49,7 @@ class PlotWindow {
 
   bool forceSquare = false;
   bool grid = false;
+  bool legend = true;
 
   Rectangle _rectangle;
   Rectangle get rectangle => _rectangle;
@@ -149,6 +151,24 @@ class PlotWindow {
     setYTics();
     drawGrid();
     drawLines();
+    drawLegend();
+  }
+
+  void drawLegend() {
+    context.fillStyle="${Color.WHITE}";
+    context.fillRect(canvas.width-80, 0, 80, lines.length * 12 + 5);
+    context.strokeStyle = "${Color.BLACK}";
+    context.lineWidth=1;
+    context.rect(canvas.width-80, 0, 80, lines.length * 12 + 5);
+    context.stroke();
+    context.font = "10px sans-serif";
+    context.textAlign = "start";
+    for(int i=0; i<lines.length; i++) {
+      var color = lines.values.toList()[i].color;
+      context.strokeStyle = "$color";
+      context.fillStyle = "$color";
+      context.fillText(lines.keys.toList()[i], canvas.width-60, 10 + i*12);
+    }
   }
   
   void setXTics() { this.axes[AxisType.X].setTics(rectangle.left, rectangle.right, canvas.width); }
