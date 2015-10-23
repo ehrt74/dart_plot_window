@@ -73,7 +73,7 @@ class PlotWindow {
   
   Map<String, Line> lines = new Map<String, Line>();
 
-  void removeLines()=>this.lines = new Map<String, Line>();
+  void removeLines() { this.lines = new Map<String, Line>(); }
   void removeLine(String s) { this.lines.remove(s); }
   
   PlotWindow(this.canvas) {

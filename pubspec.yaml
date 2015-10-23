@@ -1,6 +1,6 @@
 name: plot_window
 description: A library to use a canvas element to plot data
-version: 0.0.7
+version: 0.0.8
 author: Edouard Tavinor <edouardtavinor@gmail.com>
 homepage: https://github.com/ehrt74/dart_plot_window
 
