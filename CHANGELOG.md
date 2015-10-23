@@ -15,3 +15,6 @@
 
 ## 0.0.5
 - moved color to new file
+
+## 0.0.7
+- added method removeLines()

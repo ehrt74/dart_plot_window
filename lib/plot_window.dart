@@ -72,6 +72,9 @@ class PlotWindow {
   Point oldOffset;
   
   Map<String, Line> lines = new Map<String, Line>();
+
+  void removeLines()=>this.lines = new Map<String, Line>();
+  void removeLine(String s) { this.lines.remove(s); }
   
   PlotWindow(this.canvas) {
     this.context = canvas.context2D;
