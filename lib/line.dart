@@ -16,14 +16,14 @@ class Line {
   List<Point> points;
   Color _color;
   Color get color=>_color!=null? _color: Color.BLACK;
-  Color set color(Color c) {
+  void set color(Color c) {
     if (_fillColor==null) fillColor = c;
     _color = c;
   }
   
   Color _fillColor;
   Color get fillColor=>_fillColor!=null? _fillColor: Color.BLACK;
-  Color set fillColor(Color c) { this._fillColor = c; }
+  void set fillColor(Color c) { this._fillColor = c; }
   
   num thickness;
   LineType lineType = LineType.LINEPOINTS;

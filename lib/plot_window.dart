@@ -16,11 +16,11 @@ part "color.dart";
 // TODO: Export any libraries intended for clients of this package.
 
 
-class _PlotRectangle {
+/*class _PlotRectangle {
   Rectangle xy;
   Rectangle xy2;
   
-}
+  } */
 
 class PlotWindow {
 
@@ -33,11 +33,14 @@ class PlotWindow {
   bool forceSquare = false;
   bool grid = false;
   bool legend = true;
+  num fontSize = 10;
+  String fontFace = "sans-serif";
+  String getFontString()=>"${fontSize}px ${fontFace}";
 
   Rectangle _rectangle;
   Rectangle get rectangle => _rectangle;
 
-  Rectangle set rectangle(Rectangle r) {
+  void set rectangle(Rectangle r) {
     _rectangle=r;
     axes.values.forEach((Axis axis)=>axis.sizeFluid = false);
   }
@@ -145,15 +148,21 @@ class PlotWindow {
     context.fillRect(canvas.width-80, 0, 80, lines.length * 12 + 5);
     context.strokeStyle = "${Color.BLACK}";
     context.lineWidth=1;
-    context.rect(canvas.width-80, 0, 80, lines.length * 12 + 5);
+    context.font = getFontString();
+    num maxLength = 0;
+    lines.keys.forEach((String name) {
+      num length = context.measureText(name).width;
+      if (length>maxLength) maxLength=length;
+    });
+    num padding = 20;
+    context.rect(canvas.width-maxLength-2*padding, 0, maxLength + 2*padding, lines.length * (fontSize+2) + 5);
     context.stroke();
-    context.font = "10px sans-serif";
     context.textAlign = "start";
     for(int i=0; i<lines.length; i++) {
       var color = lines.values.toList()[i].color;
       context.strokeStyle = "$color";
       context.fillStyle = "$color";
-      context.fillText(lines.keys.toList()[i], canvas.width-60, 10 + i*12);
+      context.fillText(lines.keys.toList()[i], canvas.width-maxLength-padding, 10 + i*(fontSize+2));
     }
   }
   
@@ -194,7 +203,7 @@ class PlotWindow {
     if (!validPointForText(new Point(xTics[2], yTics.last)))
       yOffset=yTics[yTics.length -2];
 
-    context.font = "10px sans-serif";
+    context.font = getFontString();
     context.fillStyle = "${Color.BLACK}";
     context.textAlign = "end";
     yTics.forEach((num yTic) {

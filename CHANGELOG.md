@@ -21,3 +21,6 @@
 
 ## 0.0.8
 - bugfix
+
+## 0.0.9
+- added fontSize and fontFace to PlotWindow
