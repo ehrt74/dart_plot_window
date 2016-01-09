@@ -129,7 +129,7 @@ class PlotWindow {
   }
 
   void addLine(String name, Line line) {
-    if (line.points == null || line.points.length == 0) return;
+    if (line.points == null || line.validPoints.isEmpty) return;
     lines[name] = line;
   }
   
@@ -230,11 +230,11 @@ class PlotWindow {
             p.y<topLeft.y-10 && p.y>bottomRight.y+10;
   }
 
-  bool validPointForCanvas(Point p)=>!(p.x.isNaN || p.x.isInfinite || p.y.isNaN || p.y.isInfinite);
+  static bool ValidPointForCanvas(Point p)=>!(p.x.isNaN || p.x.isInfinite || p.y.isNaN || p.y.isInfinite);
   
   void drawLines() {
     this.lines.values.forEach((Line line) {
-      var points = line.points.where(validPointForCanvas).toList();
+      var points = line.validPoints;
       if (points.isNotEmpty) {
         if (line.lineType.hasLines) {
           context.setStrokeColorRgb(line.color.red, line.color.green, line.color.blue);
@@ -244,7 +244,7 @@ class PlotWindow {
           
           points.skip(1).forEach((Point p) {
             Point point = toCanvas(p);
-            if(validPointForCanvas(p))
+            if(ValidPointForCanvas(p))
               context.lineTo(point.x, point.y);
           });
           context.stroke();
