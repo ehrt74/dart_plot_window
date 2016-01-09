@@ -229,29 +229,35 @@ class PlotWindow {
     return p.x>topLeft.x+10 && p.x<bottomRight.x-10  &&
             p.y<topLeft.y-10 && p.y>bottomRight.y+10;
   }
+
+  bool validPointForCanvas(Point p)=>!(p.x.isNaN || p.x.isInfinite || p.y.isNaN || p.y.isInfinite);
   
   void drawLines() {
     this.lines.values.forEach((Line line) {
-      if (line.lineType.hasLines) {
-        context.setStrokeColorRgb(line.color.red, line.color.green, line.color.blue);
-        Point first = toCanvas(line.points.first);
-        context..beginPath()
-          ..moveTo(first.x, first.y);
-        
-        line.points.skip(1).forEach((Point p) {
-          Point point = toCanvas(p);
-          context.lineTo(point.x, point.y);
-        });
-        context.stroke();
-      }
-      if (line.lineType.hasPoints) {
-        context.fillStyle = "${line.fillColor}";
-        line.points.map((Point p)=>toCanvas(p)).forEach((Point p) {
-          context..moveTo(p.x, p.y)
-            ..beginPath()
+      var points = line.points.where(validPointForCanvas).toList();
+      if (points.isNotEmpty) {
+        if (line.lineType.hasLines) {
+          context.setStrokeColorRgb(line.color.red, line.color.green, line.color.blue);
+          Point first = toCanvas(points.first);
+          context..beginPath()
+            ..moveTo(first.x, first.y);
+          
+          points.skip(1).forEach((Point p) {
+            Point point = toCanvas(p);
+            if(validPointForCanvas(p))
+              context.lineTo(point.x, point.y);
+          });
+          context.stroke();
+        }
+        if (line.lineType.hasPoints) {
+          context.fillStyle = "${line.fillColor}";
+          points.map((Point p)=>toCanvas(p)).forEach((Point p) {
+            context..moveTo(p.x, p.y)
+              ..beginPath()
             ..arc(p.x, p.y, line.pointRadius, 0, 2*math.PI)
-            ..fill();
-        });
+              ..fill();
+          });
+        }
       }
     });
     
