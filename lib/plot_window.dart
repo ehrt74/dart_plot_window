@@ -74,8 +74,12 @@ class PlotWindow {
 
   bool mouseDrag = false;
   Point oldOffset;
-  bool _beingRendered = false;
-  bool get beingRendered=>_beingRendered;
+  bool _rendering = false;
+  bool get rendering=>_rendering;
+  void set rendering(bool r) {
+    print("setting rendering to $r");
+    _rendering=r;
+  }
   
   Map<String, Line> lines = new Map<String, Line>();
   Map<String, Line> smoothLines = new Map<String, Line>();
@@ -102,10 +106,18 @@ class PlotWindow {
   }
 
   PointSmoother get pointSmoother=>_newPointSmoother;
+
+  void addLine(String name, Line line) {
+    if (line.points == null || line.validPoints.isEmpty) return;
+    lines[name] = line;
+    this.smoothLines.clear();
+    this._currentPointSmoother = null;
+  }
   
   void removeLines() {
-    this.lines = new Map<String, Line>();
-    this.smoothLines = new Map<String, Line>();
+    this.lines.clear();
+    this.smoothLines.clear();
+    this._currentPointSmoother = null;
   }
   
   void removeLine(String s) {
@@ -116,8 +128,8 @@ class PlotWindow {
   PlotWindow(this.canvas) {
     this.context = canvas.context2D;
     this.canvas.onMouseWheel.listen((WheelEvent e) {
-      if(this._beingRendered) return;
-      this._beingRendered=true;
+      if(this.rendering) return;
+      this.rendering=true;
       axes.values.forEach((Axis axis)=>axis.sizeFluid = false);
       this.clear();
       List<AxisType> axisTypes = new List<AxisType>();
@@ -130,7 +142,7 @@ class PlotWindow {
       }
       this.rectangle = _zoom(this.rectangle, (delta/500 +1), axisTypes, toRectangle(e.offset));
       this.plot();
-      this._beingRendered=false;
+      this.rendering=false;
     });
     this.canvas.onMouseDown.listen((var e) {
       this.mouseDrag = true;
@@ -140,14 +152,14 @@ class PlotWindow {
     this.canvas.onMouseOut.listen((_)=>this.mouseDrag = false);
     this.canvas.onMouseMove.listen((var e) {
       if (this.mouseDrag) {
-        if(this._beingRendered) return;
-        this._beingRendered = true;
+        if(this.rendering) return;
+        this.rendering = true;
         var offset = toRectangle(e.offset) - toRectangle(this.oldOffset);
         this.rectangle = _shift(this.rectangle, offset);
         this.oldOffset = e.offset;
         clear();
         plot();
-        this._beingRendered=false;
+        this.rendering=false;
       }
     });
   }
@@ -168,11 +180,6 @@ class PlotWindow {
     this.context.clearRect(0,0,canvas.width, canvas.height);
   }
 
-  void addLine(String name, Line line) {
-    if (line.points == null || line.validPoints.isEmpty) return;
-    lines[name] = line;
-  }
-  
   void plot() {
     if(axes.values.map((Axis a)=>a.sizeFluid).contains(true) && !this.mouseDrag)
       rectangle = _zoom(lines.values.map((Line l)=>l.rectangle).reduce((value, element)=>value.boundingBox(element)), 1.1);
