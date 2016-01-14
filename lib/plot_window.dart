@@ -12,7 +12,7 @@ import "dart:math" as math;
 part "line.dart";
 part "axis.dart";
 part "color.dart";
-part "average.dart";
+part "point_smoother.dart";
 
 // TODO: Export any libraries intended for clients of this package.
 
@@ -31,8 +31,6 @@ class PlotWindow {
 
   Map<AxisType, Axis> axes = {AxisType.Y:new Axis(), AxisType.X:new Axis(), AxisType.Y2:new Axis()};
 
-  Average average = Average.ARITHMETIC;
-  
   bool forceSquare = false;
   bool grid = false;
   bool legend = true;
@@ -77,29 +75,33 @@ class PlotWindow {
   bool mouseDrag = false;
   Point oldOffset;
   bool _beingRendered = false;
+  bool get beingRendered=>_beingRendered;
   
   Map<String, Line> lines = new Map<String, Line>();
   Map<String, Line> smoothLines = new Map<String, Line>();
-  int _smoothness = 1;
 
-  void set smoothness(int s) {
-    if (s==_smoothness) return;
-    _smoothness = s;
+  PointSmoother _newPointSmoother = new PointSmoother(AverageMethod.ARITHMETIC, 1);
+  PointSmoother _currentPointSmoother;
+  
+  void set pointSmoother(PointSmoother ps) {
+    if (ps==_newPointSmoother) return;
+    _newPointSmoother = ps;
     smoothLines.clear();
   }
   
   void _initSmoothLines() {
-    if (_smoothness==1) {
+    if (_newPointSmoother==_currentPointSmoother) return;
+    if (_newPointSmoother.width==1) {
       smoothLines = lines;
       return;
     }
     this.smoothLines = new Map<String, Line>();
     lines.keys.forEach((String str) {
-      smoothLines[str] = lines[str].smooth(_smoothness, average);
+      smoothLines[str] = lines[str].smooth(_newPointSmoother);
     });
   }
 
-  int get smoothness=>_smoothness;
+  PointSmoother get pointSmoother=>_newPointSmoother;
   
   void removeLines() {
     this.lines = new Map<String, Line>();
