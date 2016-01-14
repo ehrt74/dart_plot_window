@@ -23,6 +23,30 @@ class Line {
     if (_fillColor==null) fillColor = c;
     _color = c;
   }
+
+
+  Line smooth(int window, Average average) {
+    if(window<2) throw "window must be larger than $window";
+    if(window%2!=1) window++;
+    if(points.length<window) throw "window must be larger than ${points.length/2}";
+    List<Point> newPoints = new List<Point>();
+    for(int i=0; i<points.length - window; i++) {
+      newPoints.add(CombinePoints(_validPoints.skip(i).take(window).toList(), average));
+    }
+    return new Line(newPoints, lineType:lineType, color:color, thickness:thickness, axisType:axisType);
+  }
+
+  static Point CombinePoints(List<Point> points, Average average) {
+    return new Point(points[points.length~/2].x, average.reduce(points.map((Point p)=>p.y).toList()));
+        /*
+    int numValidPoints =0;
+    for(Point p in points) {
+      if(PlotWindow.ValidPointForCanvas(p)) ret.y+=p.y;
+    }
+    if(numValidPoints!=0)
+    ret.y /= numValidPoints;
+    return ret; */
+  }
   
   Color _fillColor;
   Color get fillColor=>_fillColor!=null? _fillColor: Color.BLACK;

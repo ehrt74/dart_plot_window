@@ -6,16 +6,16 @@ library plot_window.test;
 import 'package:plot_window/plot_window.dart';
 import 'package:test/test.dart';
 
+Line line1;
+
 void main() {
-  group('A group of tests', () {
-    Awesome awesome;
-
-    setUp(() {
-      awesome = new Awesome();
-    });
-
-    test('First Test', () {
-      expect(awesome.isAwesome, isTrue);
-    });
+  List<Point> points = new List<Point>();
+  for (int i=0; i<10; i++) {
+    points.add(new Point(i, i*i - i + 2));
+  }
+  line1 = new Line(points);
+  
+  test('Line lenggth', () {
+    expect(line1.points.length, equals(10));
   });
 }

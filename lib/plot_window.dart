@@ -12,6 +12,7 @@ import "dart:math" as math;
 part "line.dart";
 part "axis.dart";
 part "color.dart";
+part "average.dart";
 
 // TODO: Export any libraries intended for clients of this package.
 
@@ -30,6 +31,8 @@ class PlotWindow {
 
   Map<AxisType, Axis> axes = {AxisType.Y:new Axis(), AxisType.X:new Axis(), AxisType.Y2:new Axis()};
 
+  Average average = Average.ARITHMETIC;
+  
   bool forceSquare = false;
   bool grid = false;
   bool legend = true;
@@ -73,15 +76,46 @@ class PlotWindow {
 
   bool mouseDrag = false;
   Point oldOffset;
+  bool _beingRendered = false;
   
   Map<String, Line> lines = new Map<String, Line>();
+  Map<String, Line> smoothLines = new Map<String, Line>();
+  int _smoothness = 1;
 
-  void removeLines() { this.lines = new Map<String, Line>(); }
-  void removeLine(String s) { this.lines.remove(s); }
+  void set smoothness(int s) {
+    if (s==_smoothness) return;
+    _smoothness = s;
+    smoothLines.clear();
+  }
+  
+  void _initSmoothLines() {
+    if (_smoothness==1) {
+      smoothLines = lines;
+      return;
+    }
+    this.smoothLines = new Map<String, Line>();
+    lines.keys.forEach((String str) {
+      smoothLines[str] = lines[str].smooth(_smoothness, average);
+    });
+  }
+
+  int get smoothness=>_smoothness;
+  
+  void removeLines() {
+    this.lines = new Map<String, Line>();
+    this.smoothLines = new Map<String, Line>();
+  }
+  
+  void removeLine(String s) {
+    this.lines.remove(s);
+    this.smoothLines.remove(s);
+  }
   
   PlotWindow(this.canvas) {
     this.context = canvas.context2D;
     this.canvas.onMouseWheel.listen((WheelEvent e) {
+      if(this._beingRendered) return;
+      this._beingRendered=true;
       axes.values.forEach((Axis axis)=>axis.sizeFluid = false);
       this.clear();
       List<AxisType> axisTypes = new List<AxisType>();
@@ -94,6 +128,7 @@ class PlotWindow {
       }
       this.rectangle = _zoom(this.rectangle, (delta/500 +1), axisTypes, toRectangle(e.offset));
       this.plot();
+      this._beingRendered=false;
     });
     this.canvas.onMouseDown.listen((var e) {
       this.mouseDrag = true;
@@ -103,11 +138,14 @@ class PlotWindow {
     this.canvas.onMouseOut.listen((_)=>this.mouseDrag = false);
     this.canvas.onMouseMove.listen((var e) {
       if (this.mouseDrag) {
+        if(this._beingRendered) return;
+        this._beingRendered = true;
         var offset = toRectangle(e.offset) - toRectangle(this.oldOffset);
         this.rectangle = _shift(this.rectangle, offset);
         this.oldOffset = e.offset;
         clear();
         plot();
+        this._beingRendered=false;
       }
     });
   }
@@ -139,6 +177,7 @@ class PlotWindow {
     setXTics();
     setYTics();
     drawGrid();
+    _initSmoothLines();
     drawLines();
     drawLegend();
   }
@@ -233,7 +272,7 @@ class PlotWindow {
   static bool ValidPointForCanvas(Point p)=>!(p.x.isNaN || p.x.isInfinite || p.y.isNaN || p.y.isInfinite);
   
   void drawLines() {
-    this.lines.values.forEach((Line line) {
+    this.smoothLines.values.forEach((Line line) {
       var points = line.validPoints;
       if (points.isNotEmpty) {
         if (line.lineType.hasLines) {
