@@ -90,13 +90,23 @@ class PlotWindow {
   void set pointSmoother(PointSmoother ps) {
     if (ps==_newPointSmoother) return;
     _newPointSmoother = ps;
-    smoothLines.clear();
+    //    smoothLines.clear();
   }
   
   void _initSmoothLines() {
-    if (_newPointSmoother==_currentPointSmoother) return;
     if (_newPointSmoother.width==1) {
       smoothLines = lines;
+      return;
+    }
+    if (_newPointSmoother==_currentPointSmoother) {
+      lines.keys.forEach((String str) {
+        if (!smoothLines.containsKey(str))
+          smoothLines[str] = lines[str].smooth(_newPointSmoother);
+      });
+      smoothLines.keys.forEach((String str) {
+        if (!lines.containsKey(str))
+          smoothLines.remove(str);
+      });
       return;
     }
     this.smoothLines = new Map<String, Line>();
