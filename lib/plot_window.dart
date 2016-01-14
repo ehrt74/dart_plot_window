@@ -77,7 +77,7 @@ class PlotWindow {
   bool _rendering = false;
   bool get rendering=>_rendering;
   void set rendering(bool r) {
-    print("setting rendering to $r");
+    print("setting rendering to $r (was $rendering)");
     _rendering=r;
   }
   
