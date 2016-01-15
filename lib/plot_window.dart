@@ -51,6 +51,7 @@ class PlotWindow {
   }
 
   static Rectangle _zoom(Rectangle r, num factor, [ List<AxisType> axisTypes, Point center]) {
+    print("zooming. factor: $factor");
     if (center==null)
       center = new Point(r.left + r.width/2, r.top + r.height/2);
     num left = r.left;
@@ -150,7 +151,8 @@ class PlotWindow {
         axisTypes.add(AxisType.X);
         delta = e.deltaX;
       }
-      this.rectangle = _zoom(this.rectangle, (delta/500 +1), axisTypes, toRectangle(e.offset));
+      var factor = 1 + (delta/100)/math.sqrt(delta/100 * delta/100 + 1);
+      this.rectangle = _zoom(this.rectangle, factor, axisTypes, toRectangle(e.offset));
       this.plot();
       this.rendering=false;
     });
