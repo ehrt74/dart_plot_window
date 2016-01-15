@@ -51,7 +51,6 @@ class PlotWindow {
   }
 
   static Rectangle _zoom(Rectangle r, num factor, [ List<AxisType> axisTypes, Point center]) {
-    print("zooming. factor: $factor");
     if (center==null)
       center = new Point(r.left + r.width/2, r.top + r.height/2);
     num left = r.left;
@@ -78,7 +77,6 @@ class PlotWindow {
   bool _rendering = false;
   bool get rendering=>_rendering;
   void set rendering(bool r) {
-    print("setting rendering to $r (was $rendering)");
     _rendering=r;
   }
   
@@ -91,7 +89,6 @@ class PlotWindow {
   void set pointSmoother(PointSmoother ps) {
     if (ps==_newPointSmoother) return;
     _newPointSmoother = ps;
-    print("setting _newPointSmoother to $ps");
   }
   
   void _initSmoothLines() {
@@ -100,7 +97,6 @@ class PlotWindow {
       return;
     }
     if (_newPointSmoother==_currentPointSmoother) {
-      print("pointSmoother not changed: $_newPointSmoother");
       lines.keys.forEach((String str) {
         if (!smoothLines.containsKey(str))
           smoothLines[str] = lines[str].smooth(_newPointSmoother);
@@ -111,7 +107,6 @@ class PlotWindow {
       });
       return;
     }
-    print("recalculating smoothlines");
     this.smoothLines = new Map<String, Line>();
     lines.keys.forEach((String str) {
       smoothLines[str] = lines[str].smooth(_newPointSmoother);
@@ -124,14 +119,14 @@ class PlotWindow {
   void addLine(String name, Line line) {
     if (line.points == null || line.validPoints.isEmpty) return;
     lines[name] = line;
-    this.smoothLines.clear();
-    this._currentPointSmoother = null;
+    //    this.smoothLines.clear();
+    //    this._currentPointSmoother = null;
   }
   
   void removeLines() {
     this.lines.clear();
     this.smoothLines.clear();
-    this._currentPointSmoother = null;
+    //    this._currentPointSmoother = null;
   }
   
   void removeLine(String s) {
