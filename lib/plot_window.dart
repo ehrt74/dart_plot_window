@@ -153,7 +153,7 @@ class PlotWindow {
         axisTypes.add(AxisType.X);
         delta = e.deltaX;
       }
-      var factor = 1 + (delta/100)/math.sqrt(delta/100 * delta/100 + 1);
+      var factor = 1 + (delta/1000)/math.sqrt(delta/1000 * delta/1000 + 1);
       this.rectangle = _zoom(this.rectangle, factor, axisTypes, toRectangle(e.offset));
       this.plot();
       this.rendering=false;

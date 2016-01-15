@@ -30,7 +30,7 @@ class PointSmoother {
   AverageMethod average;
   int width;
 
-  String toString()=>"${this.average.name} ($this.width)";
+  String toString()=>"${this.average.name} (${this.width})";
   
   bool operator ==(PointSmoother other) {
     return this.average==other.average && this.width==other.width;
