@@ -13,7 +13,11 @@ class AverageMethod {
     
   static AverageMethod GEOMETRIC = new AverageMethod._intern("Geometric",
       (List<num> nums)=>math.exp(nums.fold(0, (num prev, num elem)=>prev + math.log(elem))/nums.length));
-
+  bool operator ==(Object other) {
+    if(!other is AverageMethod) return false;
+    AverageMethod otherAverageMethod = other;
+    return this.name==otherAverageMethod.name;
+  }
 
   AverageMethod._intern(this.name, this.reduce) {
     CACHE[this.name] = this;
@@ -32,8 +36,10 @@ class PointSmoother {
 
   String toString()=>"${this.average.name} (${this.width})";
   
-  bool operator ==(PointSmoother other) {
-    return this.average==other.average && this.width==other.width;
+  bool operator ==(Object other) {
+    if(!other is PointSmoother) return false;
+    PointSmoother otherPointSmoother = other;
+    return this.average==otherPointSmoother.average && this.width==otherPointSmoother.width;
   }
 
   PointSmoother(this.average, this.width);

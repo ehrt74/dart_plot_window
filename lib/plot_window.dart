@@ -92,7 +92,6 @@ class PlotWindow {
     if (ps==_newPointSmoother) return;
     _newPointSmoother = ps;
     print("setting _newPointSmoother to $ps");
-    //    smoothLines.clear();
   }
   
   void _initSmoothLines() {
@@ -112,6 +111,7 @@ class PlotWindow {
       });
       return;
     }
+    print("recalculating smoothlines");
     this.smoothLines = new Map<String, Line>();
     lines.keys.forEach((String str) {
       smoothLines[str] = lines[str].smooth(_newPointSmoother);
