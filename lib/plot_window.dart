@@ -116,6 +116,7 @@ class PlotWindow {
     lines.keys.forEach((String str) {
       smoothLines[str] = lines[str].smooth(_newPointSmoother);
     });
+    _currentPointSmoother = _newPointSmoother;
   }
 
   PointSmoother get pointSmoother=>_newPointSmoother;
